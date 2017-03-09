@@ -1,7 +1,7 @@
 package com.iboism.easyimagepager;
 
 /**
- * Created by Calm on 3/8/2017.
+ * Created by Brad on 3/8/2017.
  */
 
 import android.os.Handler;;
@@ -44,8 +44,8 @@ public class PagerTimer implements Runnable {
         }
     }
 
-    public static interface TimerListener {
-        public void onIntervalTick();
+    public interface TimerListener {
+        void onIntervalTick();
     }
 
 }

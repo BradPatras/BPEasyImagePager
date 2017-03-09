@@ -3,26 +3,18 @@ package com.iboism.easyimagepager;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.RelativeLayout;
-import android.animation.Animator;
 import android.animation.ValueAnimator;
-import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AccelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.ViewFlipper;
-
 import com.squareup.picasso.Picasso;
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 /**
- * Created by Calm on 3/8/2017.
+ * Created by Brad on 3/8/2017.
  */
 
 public class EasyImagePager extends RelativeLayout {
@@ -34,7 +26,7 @@ public class EasyImagePager extends RelativeLayout {
     //objects
     private Context mContext;
     private ArrayList<View> indicators;
-    private ViewPager flipper;
+    private ViewPager pager;
     private PagerTimer imageUpdateTimer;
     //primitives
     private boolean swipeDirectionForward;
@@ -43,6 +35,18 @@ public class EasyImagePager extends RelativeLayout {
     private int animationDuration;
     private int indicatorSelected;
     private int indicatorDeselected;
+
+    /**
+     * Create a new EasyImagePager from a list of image urls
+     * @param context
+     * @param imageUrls
+     * @param shouldAutoScroll whether or not the pager will automatically scroll
+     */
+    public EasyImagePager(Context context, ArrayList<String> imageUrls, boolean shouldAutoScroll){
+        super(context);
+        sharedConstructor(context, shouldAutoScroll);
+        setImages(imageUrls);
+    }
 
     public EasyImagePager(Context context) {
         super(context);
@@ -75,35 +79,68 @@ public class EasyImagePager extends RelativeLayout {
     //endregion
 
     //region Getters and Setters
+
+    /**
+     *
+     * @return delay between page animations in milliseconds
+     */
     public int getAnimationDelay() {
         return animationDelay;
     }
 
+    /**
+     *
+     * @return the time it takes to animate between pages in milliseconds
+     */
     public int getAnimationDuration() {
         return animationDuration;
     }
 
+    /**
+     *
+     * @param delay set the time between page animations in milliseconds
+     */
     public void setAnimationDelay(int delay){
         animationDelay = delay;
     }
 
+    /**
+     *
+     * @param duration set the time it takes to animate to a new page in milliseconds
+     */
     public void setAnimationDuration(int duration){
         animationDuration = duration;
     }
 
-    public void setIndicatorDeselected(int indicatorDeselected) {
+    /**
+     *
+     * @param indicatorDeselected set the resource for the deselected indicator drawable
+     */
+    public void setIndicatorDeselectedResource(int indicatorDeselected) {
         this.indicatorDeselected = indicatorDeselected;
     }
 
-    public void setIndicatorSelected(int indicatorSelected) {
+    /**
+     *
+     * @param indicatorSelected set the resource for the selected indicator drawable
+     */
+    public void setIndicatorSelectedResource(int indicatorSelected) {
         this.indicatorSelected = indicatorSelected;
     }
 
-    public int getIndicatorSelected() {
+    /**
+     *
+     * @return the resource for the selected indicator drawable
+     */
+    public int getIndicatorSelectedResource() {
         return indicatorSelected;
     }
 
-    public int getIndicatorDeselected() {
+    /**
+     *
+     * @return the resource for the deselected indicator drawable
+     */
+    public int getIndicatorDeselectedResource() {
         return indicatorDeselected;
     }
     //endregion
@@ -120,11 +157,11 @@ public class EasyImagePager extends RelativeLayout {
             imageUpdateTimer = new PagerTimer(animationDelay, new PagerTimer.TimerListener() {
                 @Override
                 public void onIntervalTick() {
-                    if (flipper != null && flipper.getChildCount() > 0) {
+                    if (pager != null && pager.getChildCount() > 0) {
                         //if the pager has reached the end, reverse the direction of the swipe animation
-                        if (flipper.getCurrentItem() == indicators.size() - 1) {
+                        if (pager.getCurrentItem() == indicators.size() - 1) {
                             swipeDirectionForward = false;
-                        } else if (flipper.getCurrentItem() == 0) {
+                        } else if (pager.getCurrentItem() == 0) {
                             swipeDirectionForward = true;
                         }
                         animatePagerTransition(swipeDirectionForward);
@@ -157,13 +194,13 @@ public class EasyImagePager extends RelativeLayout {
      */
     public void setImages(ArrayList<String> imageUrls){
         RelativeLayout root = (RelativeLayout) LayoutInflater.from(mContext).inflate(R.layout.easy_image_pager,this);
-        flipper = (ViewPager) root.findViewById(R.id.image_pager);
+        pager = (ViewPager) root.findViewById(R.id.image_pager);
         LinearLayout indicatorContainer = (LinearLayout) root.findViewById(R.id.indicator_container);
-        ImageStreamAdapter adapter = new ImageStreamAdapter();
+        ImagePagerAdapter adapter = new ImagePagerAdapter();
         indicators.clear();
 
         for(String url: imageUrls){
-            //create an imageview, load it with a url, and add it as a flipper child
+            //create an imageview, load it with a url, and add it as a pager child
             ImageView photo = new ImageView(mContext);
             ViewGroup.LayoutParams photoLayout = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
             photo.setLayoutParams(photoLayout);
@@ -172,19 +209,18 @@ public class EasyImagePager extends RelativeLayout {
             Picasso.with(mContext).load(url).into(photo);
             adapter.addView(photo);
 
-            //create an indicator circle for each view in the flipper
-            View v = new View(mContext);
+            //create an indicator circle for each view in the pager
+            View indicator = new View(mContext);
             LinearLayout.LayoutParams indicatorLayout = new LinearLayout.LayoutParams(pixelConvert(6), pixelConvert(6));
             indicatorLayout.setMargins(pixelConvert(2),0,pixelConvert(2),0);
-            v.setLayoutParams(indicatorLayout);
-            v.setBackgroundResource(INDICATOR_DESELECTED_RES);
-            indicators.add(v);
-            indicatorContainer.addView(v, indicatorLayout);
-
+            indicator.setLayoutParams(indicatorLayout);
+            indicator.setBackgroundResource(INDICATOR_DESELECTED_RES);
+            indicators.add(indicator);
+            indicatorContainer.addView(indicator, indicatorLayout);
         }
 
         //Add a listener to the pager so that we can update the indicator when the page changes
-        flipper.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+        pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
                 updateIndicators(position);
@@ -195,7 +231,7 @@ public class EasyImagePager extends RelativeLayout {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
         });
-        flipper.setAdapter(adapter);
+        pager.setAdapter(adapter);
         adapter.notifyDataSetChanged();
         updateIndicators(0);
 
@@ -228,7 +264,6 @@ public class EasyImagePager extends RelativeLayout {
             }
             i++;
         }
-
     }
 
     /**
@@ -237,34 +272,12 @@ public class EasyImagePager extends RelativeLayout {
      * @param forward the direction of the swipe
      */
     private void animatePagerTransition(final boolean forward) {
-        if (flipper.getChildCount()==0) return;
+        if (pager.getChildCount()==0) return;
 
-        ValueAnimator animator = ValueAnimator.ofInt(0, flipper.getWidth());
-        animator.addListener(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                if(flipper.isFakeDragging())
-                    flipper.endFakeDrag();
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animation) {
-                if (flipper.isFakeDragging())
-                    flipper.endFakeDrag();
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animation) {
-            }
-        });
-
+        ValueAnimator animator = ValueAnimator.ofInt(0, pager.getWidth());
+        animator.addListener(new PagerAnimator(this.pager));
         animator.setInterpolator(new FastOutSlowInInterpolator());
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-
             private int oldDragPosition = 0;
 
             @Override
@@ -272,59 +285,13 @@ public class EasyImagePager extends RelativeLayout {
                 int dragPosition = (Integer) animation.getAnimatedValue();
                 int dragOffset = dragPosition - oldDragPosition;
                 oldDragPosition = dragPosition;
-                if(flipper.isFakeDragging()) {
-                    flipper.fakeDragBy(dragOffset * (forward ? -1 : 1));
+                if(pager.isFakeDragging()) {
+                    pager.fakeDragBy(dragOffset * (forward ? -1 : 1));
                 }
             }
         });
-
         animator.setDuration(animationDuration);
-        flipper.beginFakeDrag();
+        pager.beginFakeDrag();
         animator.start();
     }
-
-    /**
-     * Adapter class for the pager
-     * addView allows loading of images into its collection one by one
-     */
-    public class ImageStreamAdapter extends PagerAdapter{
-        ArrayList<ImageView> images;
-
-        public ImageStreamAdapter(){
-            images = new ArrayList<>();
-        }
-
-        @Override
-        public int getCount ()
-        {
-            return images.size();
-        }
-
-        public void addView(ImageView view){
-            images.add(view);
-        }
-
-        @Override
-        public void destroyItem(ViewGroup container, int position, Object object) {
-            container.removeView((View) object);
-        }
-
-        @Override
-        public boolean isViewFromObject(View view, Object object) {
-            return view.equals(object);
-        }
-
-        @Override
-        public Object instantiateItem (ViewGroup container, int position)
-        {
-            ImageView v = images.get (position);
-            container.addView (v);
-            return v;
-        }
-
-
-    }
-
-
-
 }
