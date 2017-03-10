@@ -2,14 +2,13 @@ package com.iboism.easyimagepager;
 
 import android.animation.Animator;
 import android.support.v4.view.ViewPager;
-import android.view.ViewParent;
 
 /**
  * Created by Calm on 3/8/2017.
  */
 
-public class PagerAnimator implements Animator.AnimatorListener {
-    ViewPager pager;
+class PagerAnimator implements Animator.AnimatorListener {
+    private ViewPager pager;
     public PagerAnimator(ViewPager pager){
         this.pager = pager;
     }

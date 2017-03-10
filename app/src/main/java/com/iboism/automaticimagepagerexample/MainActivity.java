@@ -2,9 +2,7 @@ package com.iboism.automaticimagepagerexample;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-
 import com.iboism.easyimagepager.EasyImagePager;
-
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {

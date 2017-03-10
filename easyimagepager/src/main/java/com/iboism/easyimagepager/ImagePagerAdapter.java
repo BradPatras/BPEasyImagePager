@@ -10,7 +10,7 @@ import java.util.ArrayList;
 /**
  * Created by Calm on 3/8/2017.
  */
-public class ImagePagerAdapter extends PagerAdapter {
+class ImagePagerAdapter extends PagerAdapter {
     ArrayList<ImageView> images;
 
     public ImagePagerAdapter(){

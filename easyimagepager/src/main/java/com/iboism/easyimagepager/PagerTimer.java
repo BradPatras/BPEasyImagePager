@@ -4,12 +4,9 @@ package com.iboism.easyimagepager;
  * Created by Brad on 3/8/2017.
  */
 
-import android.os.Handler;;
+import android.os.Handler;
 
-/**
- * Created by wdian on 12/13/14.
- */
-public class PagerTimer implements Runnable {
+class PagerTimer implements Runnable {
 
     private Handler handler;
     private TimerListener timerListener;

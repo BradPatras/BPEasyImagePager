@@ -1,6 +1,7 @@
 package com.iboism.easyimagepager;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.widget.RelativeLayout;
 import android.animation.ValueAnimator;
@@ -18,11 +19,11 @@ import java.util.ArrayList;
  */
 
 public class EasyImagePager extends RelativeLayout {
-    private final int PAGER_ANIMATION_DURATION = 800;
-    private final int PAGER_ANIMATION_DELAY = 5000;
-    private final int INDICATOR_SELECTED_RES = R.drawable.image_flipper_indicator_circle_selected;
-    private final int INDICATOR_DESELECTED_RES = R.drawable.image_flipper_indicator_circle_deselected;
-    private final boolean DEFAULT_AUTO_SCROLL = true;
+    private static final int PAGER_ANIMATION_DURATION = 800;
+    private static final int PAGER_ANIMATION_DELAY = 5000;
+    private static final int INDICATOR_SELECTED_RES = R.drawable.image_flipper_indicator_circle_selected;
+    private static final int INDICATOR_DESELECTED_RES = R.drawable.image_flipper_indicator_circle_deselected;
+    private static final boolean DEFAULT_AUTO_SCROLL = true;
     //objects
     private Context mContext;
     private ArrayList<View> indicators;
@@ -35,7 +36,7 @@ public class EasyImagePager extends RelativeLayout {
     private int animationDuration;
     private int indicatorSelected;
     private int indicatorDeselected;
-
+    private static int what = 5;
     /**
      * Create a new EasyImagePager from a list of image urls
      * @param context
@@ -46,6 +47,7 @@ public class EasyImagePager extends RelativeLayout {
         super(context);
         sharedConstructor(context, shouldAutoScroll);
         setImages(imageUrls);
+
     }
 
     public EasyImagePager(Context context) {
@@ -192,14 +194,16 @@ public class EasyImagePager extends RelativeLayout {
      * Create the view pager with a page for each of the image urls, with indicators
      * @param imageUrls array of urls that point to images for the pager, each image will have it's own page
      */
-    public void setImages(ArrayList<String> imageUrls){
+    public void setImages(@NonNull ArrayList<String> imageUrls){
         RelativeLayout root = (RelativeLayout) LayoutInflater.from(mContext).inflate(R.layout.easy_image_pager,this);
         pager = (ViewPager) root.findViewById(R.id.image_pager);
         LinearLayout indicatorContainer = (LinearLayout) root.findViewById(R.id.indicator_container);
         ImagePagerAdapter adapter = new ImagePagerAdapter();
         indicators.clear();
+        indicatorContainer.removeAllViewsInLayout();
 
-        for(String url: imageUrls){
+        //Add an imageview and a page indicator for each image url
+        for (String url : imageUrls) {
             //create an imageview, load it with a url, and add it as a pager child
             ImageView photo = new ImageView(mContext);
             ViewGroup.LayoutParams photoLayout = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
@@ -212,7 +216,7 @@ public class EasyImagePager extends RelativeLayout {
             //create an indicator circle for each view in the pager
             View indicator = new View(mContext);
             LinearLayout.LayoutParams indicatorLayout = new LinearLayout.LayoutParams(pixelConvert(6), pixelConvert(6));
-            indicatorLayout.setMargins(pixelConvert(2),0,pixelConvert(2),0);
+            indicatorLayout.setMargins(pixelConvert(2), 0, pixelConvert(2), 0);
             indicator.setLayoutParams(indicatorLayout);
             indicator.setBackgroundResource(INDICATOR_DESELECTED_RES);
             indicators.add(indicator);
@@ -225,7 +229,6 @@ public class EasyImagePager extends RelativeLayout {
             public void onPageSelected(int position) {
                 updateIndicators(position);
             }
-
             @Override
             public void onPageScrollStateChanged(int state) {}
             @Override
