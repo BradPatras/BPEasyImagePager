@@ -1,6 +1,7 @@
 package com.iboism.easyimagepager;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.widget.RelativeLayout;
@@ -14,29 +15,36 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
+
 /**
  * Created by Brad on 3/8/2017.
  */
 
 public class EasyImagePager extends RelativeLayout {
-    private static final int PAGER_ANIMATION_DURATION = 800;
-    private static final int PAGER_ANIMATION_DELAY = 5000;
-    private static final int INDICATOR_SELECTED_RES = R.drawable.image_flipper_indicator_circle_selected;
-    private static final int INDICATOR_DESELECTED_RES = R.drawable.image_flipper_indicator_circle_deselected;
-    private static final boolean DEFAULT_AUTO_SCROLL = true;
-    //objects
+
     private Context mContext;
     private ArrayList<View> indicators;
     private ViewPager pager;
     private PagerTimer imageUpdateTimer;
-    //primitives
+    private PageChangedListener onPageChangedListener;
+    private Drawable imagePlaceholder;
+
     private boolean swipeDirectionForward;
     private boolean shouldAutoScroll;
     private int animationDelay;
     private int animationDuration;
     private int indicatorSelected;
     private int indicatorDeselected;
-    private static int what = 5;
+    private int indicatorMargin;
+    private int indicatorWidth;
+    private int indicatorHeight;
+
+    public interface PageChangedListener{
+        void onPageChanged(int newPageIndex);
+    }
+
+    //region Constructors
+    
     /**
      * Create a new EasyImagePager from a list of image urls
      * @param context
@@ -52,35 +60,70 @@ public class EasyImagePager extends RelativeLayout {
 
     public EasyImagePager(Context context) {
         super(context);
-        sharedConstructor(context, DEFAULT_AUTO_SCROLL);
+        sharedConstructor(context, Defaults.AUTO_SCROLL);
     }
 
     public EasyImagePager(Context context, AttributeSet attrs) {
         super(context, attrs);
-        sharedConstructor(context, DEFAULT_AUTO_SCROLL);
+        sharedConstructor(context, Defaults.AUTO_SCROLL);
     }
 
     public EasyImagePager(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        sharedConstructor(context, DEFAULT_AUTO_SCROLL);
+        sharedConstructor(context, Defaults.AUTO_SCROLL);
     }
 
     private void sharedConstructor(Context context, Boolean autoScroll){
         mContext = context;
         indicators = new ArrayList<>();
         swipeDirectionForward = true;
-        animationDelay = PAGER_ANIMATION_DELAY;
-        animationDuration = PAGER_ANIMATION_DURATION;
-        indicatorSelected = INDICATOR_SELECTED_RES;
-        indicatorDeselected = INDICATOR_DESELECTED_RES;
+        animationDelay = Defaults.PAGER_ANIMATION_DELAY;
+        animationDuration = Defaults.PAGER_ANIMATION_DURATION;
+        indicatorSelected = Defaults.INDICATOR_SELECTED_RES;
+        indicatorDeselected = Defaults.INDICATOR_DESELECTED_RES;
+        indicatorHeight = Defaults.INDICATOR_HEIGHT;
+        indicatorWidth = Defaults.INDICATOR_WIDTH;
+        indicatorMargin = Defaults.INDICATOR_MARGIN;
         this.shouldAutoScroll = autoScroll;
-        //Create the timer that will change the page after a delay
+
         setAutoScroll(autoScroll);
     }
 
     //endregion
 
     //region Getters and Setters
+
+    /**
+     * set the size of the space between the indicators (in dp)
+     * @param indicatorMargin
+     */
+    public void setIndicatorMargin(int indicatorMargin) {
+        this.indicatorMargin = indicatorMargin;
+    }
+
+    /**
+     * set the width of each indicator (in dp)
+     * @param indicatorWidth
+     */
+    public void setIndicatorWidth(int indicatorWidth) {
+        this.indicatorWidth = indicatorWidth;
+    }
+
+    /**
+     * set the height of each indicator (in dp)
+     * @param indicatorHeight
+     */
+    public void setIndicatorHeight(int indicatorHeight) {
+        this.indicatorHeight = indicatorHeight;
+    }
+
+    /**
+     * Listener called every time a page is selected
+     * @param onPageChangedListener
+     */
+    public void setOnPageChangedListener(PageChangedListener onPageChangedListener) {
+        this.onPageChangedListener = onPageChangedListener;
+    }
 
     /**
      *
@@ -145,8 +188,26 @@ public class EasyImagePager extends RelativeLayout {
     public int getIndicatorDeselectedResource() {
         return indicatorDeselected;
     }
-    //endregion
 
+
+    /**
+     * return the index of the currently showing page.  If pager is animating to a new page when called,
+     * this method will return the page where the animation started.
+     * @return
+     */
+    public int getCurrentPageIndex(){
+        return pager.getCurrentItem();
+    }
+
+    /**
+     * Set the image that will show up int the pager while the images are being loaded
+     * @param imagePlaceholder
+     */
+    public void setImagePlaceholder(Drawable imagePlaceholder) {
+        this.imagePlaceholder = imagePlaceholder;
+    }
+
+    //endregion
 
     @Override
     protected void onDetachedFromWindow() {
@@ -181,6 +242,10 @@ public class EasyImagePager extends RelativeLayout {
         }
     }
 
+    /**
+     * Set whether the pager will automatically scroll through pages
+     * @param shouldAutoScroll
+     */
     public void setAutoScroll(boolean shouldAutoScroll){
         this.shouldAutoScroll = shouldAutoScroll;
         if (shouldAutoScroll){
@@ -205,28 +270,28 @@ public class EasyImagePager extends RelativeLayout {
         //Add an imageview and a page indicator for each image url
         for (String url : imageUrls) {
             //create an imageview, load it with a url, and add it as a pager child
-            ImageView photo = new ImageView(mContext);
-            ViewGroup.LayoutParams photoLayout = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-            photo.setLayoutParams(photoLayout);
-            photo.setAdjustViewBounds(true);
-            photo.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            Picasso.with(mContext).load(url).into(photo);
+            ImageView photo = createImageView(mContext);
             adapter.addView(photo);
+            if (imagePlaceholder != null){
+                Picasso.with(mContext).load(url).placeholder(imagePlaceholder).into(photo);
+            } else {
+                Picasso.with(mContext).load(url).into(photo);
+            }
 
             //create an indicator circle for each view in the pager
-            View indicator = new View(mContext);
-            LinearLayout.LayoutParams indicatorLayout = new LinearLayout.LayoutParams(pixelConvert(6), pixelConvert(6));
-            indicatorLayout.setMargins(pixelConvert(2), 0, pixelConvert(2), 0);
-            indicator.setLayoutParams(indicatorLayout);
-            indicator.setBackgroundResource(INDICATOR_DESELECTED_RES);
+            LinearLayout.LayoutParams indicatorLayout = new LinearLayout.LayoutParams(pixelConvert(indicatorWidth), pixelConvert(indicatorHeight));
+            indicatorLayout.setMargins(pixelConvert(indicatorMargin), 0, pixelConvert(indicatorMargin), 0);
+            View indicator = createView(mContext,indicatorLayout);
             indicators.add(indicator);
             indicatorContainer.addView(indicator, indicatorLayout);
         }
 
-        //Add a listener to the pager so that we can update the indicator when the page changes
+        //Add a listener to the pager so that we can update the indicators and notify the listener
         pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
+                if (onPageChangedListener != null)
+                    onPageChangedListener.onPageChanged(position);
                 updateIndicators(position);
             }
             @Override
@@ -238,9 +303,34 @@ public class EasyImagePager extends RelativeLayout {
         adapter.notifyDataSetChanged();
         updateIndicators(0);
 
+        indicatorContainer.setVisibility((indicators.size()==1) ? INVISIBLE : VISIBLE);
+
         if (shouldAutoScroll){
             startAutoScroll();
+        } else {
+            cancelAutoScroll();
         }
+    }
+
+    /**
+     * Create and setup an ImageView to use with the viewPager
+     * @param context
+     * @return empty ImageView to use with the viewPager
+     */
+    private ImageView createImageView(Context context){
+        ImageView photo = new ImageView(context);
+        ViewGroup.LayoutParams photoLayout = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        photo.setLayoutParams(photoLayout);
+        photo.setAdjustViewBounds(true);
+        photo.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        return photo;
+    }
+
+    private View createView(Context context, LinearLayout.LayoutParams indicatorParams){
+        View indicator = new View(context);
+        indicator.setLayoutParams(indicatorParams);
+        indicator.setBackgroundResource(indicatorDeselected);
+        return indicator;
     }
 
     /**
