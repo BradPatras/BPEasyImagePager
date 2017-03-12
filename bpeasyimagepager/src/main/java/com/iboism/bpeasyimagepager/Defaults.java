@@ -1,4 +1,4 @@
-package com.iboism.easyimagepager;
+package com.iboism.bpeasyimagepager;
 
 /**
  * Created by Calm on 3/10/2017.

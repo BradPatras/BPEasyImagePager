@@ -1,0 +1,117 @@
+apply plugin: 'com.android.library'
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.jfrog.bintray'
+
+android {
+    compileSdkVersion 25
+    buildToolsVersion "25.0.2"
+
+    defaultConfig {
+        minSdkVersion 11
+        targetSdkVersion 25
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    compile 'com.android.support:appcompat-v7:25.2.0'
+    testCompile 'junit:junit:4.12'
+    compile 'com.squareup.picasso:picasso:2.5.2'
+}
+repositories {
+    mavenCentral()
+}
+
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+
+task javadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
+
+group = 'com.iboism.bpeasyimagepager'
+version = '0.1.0'
+
+install {
+    repositories.mavenInstaller {
+        pom.project {
+            name 'BPEasyImagePager'
+            description ''
+            url 'https://github.com/BradPatras/EasyImagePager'
+            inceptionYear '2017'
+
+            packaging 'aar'
+            groupId 'com.iboism.bpeasyimagepager'
+            artifactId 'bpeasyimagepager'
+            version '0.1.0'
+
+            licenses {
+                license {
+                    name 'The MIT License (MIT)'
+                    url 'https://opensource.org/licenses/MIT'
+                }
+            }
+            scm {
+                connection 'https://github.com/BradPatras/EasyImagePager.git'
+                url 'https://github.com/BradPatras/EasyImagePager'
+
+            }
+            developers {
+                developer {
+                    id = 'bradpatras'
+                    name 'Brad'
+                }
+            }
+        }
+    }
+}
+
+Properties bintrayProperties = new Properties()
+bintrayProperties.load(project.rootProject.file('bintray.properties').newDataInputStream())
+
+bintray {
+    user = bintrayProperties.getProperty('user')
+    key = bintrayProperties.get('key')
+    configurations = ['archives']
+    pkg {
+        repo = 'android'
+        name = 'bpeasyimagepager'
+        userOrg = 'bradpatras'
+        licenses = ['MIT']
+        vcsUrl = 'https://github.com/BradPatras/EasyImagePager.git'
+        publish = true
+        version {
+            name = '0.1.0'
+            desc = 'BPEasyImagePager 0.1.0'
+            released = new Date()
+            vcsTag = 'v0.1.0'
+        }
+    }
+}

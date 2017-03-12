@@ -1,4 +1,4 @@
-package com.iboism.easyimagepager;
+package com.iboism.bpeasyimagepager;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

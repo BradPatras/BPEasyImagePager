@@ -1,4 +1,4 @@
-package com.iboism.easyimagepager;
+package com.iboism.bpeasyimagepager;
 
 import org.junit.Test;
 

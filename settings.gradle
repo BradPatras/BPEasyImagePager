@@ -1,1 +1,1 @@
-include ':app', ':easyimagepager'
+include ':app', ':bpeasyimagepager'

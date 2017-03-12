@@ -1,4 +1,4 @@
-package com.iboism.easyimagepager;
+package com.iboism.bpeasyimagepager;
 
 import android.animation.Animator;
 import android.support.v4.view.ViewPager;

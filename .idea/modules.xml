@@ -4,7 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/AutomaticImagePagerExample.iml" filepath="$PROJECT_DIR$/AutomaticImagePagerExample.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/easyimagepager/easyimagepager.iml" filepath="$PROJECT_DIR$/easyimagepager/easyimagepager.iml" />
+      <module fileurl="file://$PROJECT_DIR$/bpeasyimagepager/bpeasyimagepager.iml" filepath="$PROJECT_DIR$/bpeasyimagepager/bpeasyimagepager.iml" />
     </modules>
   </component>
 </project>

@@ -1,4 +1,4 @@
-package com.iboism.easyimagepager;
+package com.iboism.bpeasyimagepager;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
@@ -20,7 +20,7 @@ import java.util.ArrayList;
  * Created by Brad on 3/8/2017.
  */
 
-public class EasyImagePager extends RelativeLayout {
+public class BPEasyImagePager extends RelativeLayout {
 
     private Context mContext;
     private ArrayList<View> indicators;
@@ -51,24 +51,24 @@ public class EasyImagePager extends RelativeLayout {
      * @param imageUrls
      * @param shouldAutoScroll whether or not the pager will automatically scroll
      */
-    public EasyImagePager(Context context, ArrayList<String> imageUrls, boolean shouldAutoScroll){
+    public BPEasyImagePager(Context context, ArrayList<String> imageUrls, boolean shouldAutoScroll){
         super(context);
         sharedConstructor(context, shouldAutoScroll);
         setImages(imageUrls);
 
     }
 
-    public EasyImagePager(Context context) {
+    public BPEasyImagePager(Context context) {
         super(context);
         sharedConstructor(context, Defaults.AUTO_SCROLL);
     }
 
-    public EasyImagePager(Context context, AttributeSet attrs) {
+    public BPEasyImagePager(Context context, AttributeSet attrs) {
         super(context, attrs);
         sharedConstructor(context, Defaults.AUTO_SCROLL);
     }
 
-    public EasyImagePager(Context context, AttributeSet attrs, int defStyleAttr) {
+    public BPEasyImagePager(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         sharedConstructor(context, Defaults.AUTO_SCROLL);
     }
