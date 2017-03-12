@@ -1,4 +1,5 @@
 # BPEasyImagePager
+<img src="https://github.com/BradPatras/BPEasyImagePager/raw/master/sc.png" alt="example" width="180" height="290">
 
 ## Add via Gradle
 ***
