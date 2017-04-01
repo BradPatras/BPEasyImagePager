@@ -36,12 +36,13 @@ The easiest way to get started is to add the BPEasyImagePager to your xml layout
 ```
 Then, when you assign your views in code, just give the BPEasyImagePager an array of urls and it will handle the rest
 ```java
+ArrayList<String> arr = new ArrayList<>();
+arr.add("http://i.imgur.com/v60CSTt.jpg");
+arr.add("http://i.imgur.com/5OQ7Pug.jpg");
+arr.add("http://i.imgur.com/8cBYgMI.jpg");
+
 BPEasyImagePager pager = (BPEasyImagePager) findViewById(R.id.placeholder);
-        ArrayList<String> arr = new ArrayList<>();
-        arr.add("http://i.imgur.com/v60CSTt.jpg");
-        arr.add("http://i.imgur.com/5OQ7Pug.jpg");
-        arr.add("http://i.imgur.com/8cBYgMI.jpg");
-        pager.setImages(arr);
+pager.setImages(arr);
 ```
 
 ## Customization
