@@ -22,7 +22,7 @@ dependencies {
 }
 ```
 
-##Usage
+## Usage
 ***
 The easiest way to get started is to add the BPEasyImagePager to your xml layout
 ```xml
@@ -44,7 +44,7 @@ BPEasyImagePager pager = (BPEasyImagePager) findViewById(R.id.placeholder);
         pager.setImages(arr);
 ```
 
-##Customization
+## Customization
 ***
 Just about everything that has a default value can be customized by you, from the animation times to the drawables for the page indicators. 
 
