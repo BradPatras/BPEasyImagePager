@@ -32,7 +32,7 @@ The easiest way to get started is to add the BPEasyImagePager to your xml layout
         android:layout_height="300dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent"/>
 ```
 Then, when you assign your views in code, just give the BPEasyImagePager an array of urls and it will handle the rest
 ```java
